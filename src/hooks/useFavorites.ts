@@ -4,16 +4,16 @@ import { useState } from 'react';
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  const isFavorite = (id: string) => Boolean(favorites.indexOf(id));
+  const isFavorite = (id: string) => favorites.includes(id);
 
   const toggle = (id: string) => {
-    const index = favorites.indexOf(id);
-    if (index === -1) {
-      favorites.push(id);
-    } else {
-      favorites.splice(index, 1);
-    }
-    setFavorites(favorites);
+    setFavorites((currentFavorites) => {
+      if (currentFavorites.includes(id)) {
+        return currentFavorites.filter((favoriteId) => favoriteId !== id);
+      }
+
+      return [...currentFavorites, id];
+    });
   };
 
   return { favorites, isFavorite, toggle };

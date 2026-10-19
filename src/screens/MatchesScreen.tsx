@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-
+import { UpdatedAgo } from '../components/UpdatedAgo';
 import { MatchCard } from '../components/MatchCard';
 import { useMatches } from '../hooks/useMatches';
+import { useFavorites } from '../hooks/useFavorites';
 
 type MatchFilter = 'all' | 'upcoming' | 'finished';
 
@@ -13,8 +14,8 @@ const filters: { label: string; value: MatchFilter }[] = [
 ];
 
 export function MatchesScreen() {
-  const { matches, isLoading, error, refresh } = useMatches();
-
+  const { matches, isLoading, error, refresh, lastUpdated } = useMatches();
+  const { isFavorite, toggle } = useFavorites();
   const [filter, setFilter] = useState<MatchFilter>('all');
 
   const filteredMatches = matches.filter((match) => {
@@ -44,11 +45,7 @@ export function MatchesScreen() {
       <View style={styles.centered}>
         <Text style={styles.errorText}>{error}</Text>
 
-        <Pressable
-          style={styles.retryButton}
-          onPress={() => void refresh()}
-          accessibilityRole="button"
-        >
+        <Pressable style={styles.retryButton} onPress={() => refresh()} accessibilityRole="button">
           <Text style={styles.retryButtonText}>Повторить</Text>
         </Pressable>
       </View>
@@ -58,6 +55,19 @@ export function MatchesScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Матчи тура</Text>
+
+      <View style={styles.updateRow}>
+        {lastUpdated && <UpdatedAgo since={lastUpdated} />}
+
+        <Pressable
+          style={styles.refreshButton}
+          onPress={() => void refresh()}
+          accessibilityRole="button"
+          accessibilityLabel="Обновить список матчей"
+        >
+          <Text style={styles.refreshButtonText}>Обновить</Text>
+        </Pressable>
+      </View>
 
       <View style={styles.filters}>
         {filters.map((item) => {
@@ -82,7 +92,9 @@ export function MatchesScreen() {
       <FlatList
         data={filteredMatches}
         keyExtractor={(match) => match.id}
-        renderItem={({ item }) => <MatchCard match={item} />}
+        renderItem={({ item }) => (
+          <MatchCard match={item} isFavorite={isFavorite(item.id)} onToggleFavorite={toggle} />
+        )}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
@@ -107,6 +119,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f9fafb',
+  },
+  updateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 12,
+  },
+  refreshButton: {
+    backgroundColor: '#e5e7eb',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  refreshButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#111827',
   },
   title: {
     fontSize: 24,

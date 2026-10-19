@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Match } from '../types';
+import { FavoriteButton } from './FavoriteButton';
 
-type Props = {
+interface Props {
   match: Match;
-};
+  isFavorite: boolean;
+  onToggleFavorite: (matchId: string) => void;
+}
 
 const statusLabels: Record<string, string> = {
   finished: 'Завершён',
@@ -31,7 +34,7 @@ function formatMatchDate(startsAt: string | null): string {
   }).format(date);
 }
 
-export function MatchCard({ match }: Props) {
+export function MatchCard({ match, isFavorite, onToggleFavorite }: Props) {
   const status = statusLabels[match.status] ?? 'Статус неизвестен';
 
   return (
@@ -39,9 +42,13 @@ export function MatchCard({ match }: Props) {
       <View style={styles.header}>
         <Text style={styles.status}>{status}</Text>
 
-        {match.status === 'live' && match.minute != null && (
-          <Text style={styles.minute}>{match.minute}'</Text>
-        )}
+        <View style={styles.headerActions}>
+          {match.status === 'live' && match.minute != null && (
+            <Text style={styles.minute}>{match.minute}'</Text>
+          )}
+
+          <FavoriteButton active={isFavorite} onPress={() => onToggleFavorite(match.id)} />
+        </View>
       </View>
 
       <View style={styles.teams}>
@@ -79,6 +86,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   status: {
     fontSize: 13,
