@@ -1,5 +1,5 @@
 import { MATCHES_URL } from '../config';
-import { MatchesResponse } from '../types';
+import { MatchesResponse } from '../types/types';
 
 export const getMatches = async (): Promise<MatchesResponse> => {
   const response = await fetch(MATCHES_URL);

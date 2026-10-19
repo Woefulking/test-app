@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Match } from '../types';
 import { getMatches } from '../api/getMatches';
+import { Match } from '../types/types';
 
 export function useMatches() {
   const [matches, setMatches] = useState<Match[]>([]);

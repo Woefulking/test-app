@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Match } from '../types';
 import { FavoriteButton } from './FavoriteButton';
+import { Match } from '../types/types';
 
 interface Props {
   match: Match;
